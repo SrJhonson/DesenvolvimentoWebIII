@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Compras</title>
+</head>
+<body>
+    <h1>Minha Lista de Compras</h1>
+    <input type="text" id="novoItem" placeholder="Digite um item">
+    <button id="adicionarBtn">Adicionar</button>
+    <h2>Itens:</h2>
+    <ul id="listaCompras"></ul>
+
+    <script>
+        // Funções para interagir com o backend
+        const obterItens = () => fetch('/itens').then(res => res.json()); 
+        // Busca os itens no servidor usando fetch ("rede") requisição GET e resposta em JSON
+        
+        const adicionarItem = (nome) => fetch('/itens', { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ nome, comprado: false }) 
+        });
+        // Adiciona os itens no servidor usando fetch ("rede") requisição Post e resposta em JSON, status compra false
+        
+        //implantar PUT para atualizar o status do item para comprado
+
+        const removerItem = (index) => fetch(`/itens/${index}`, { method: 'DELETE' }); 
+        // Remove o item         
+
+        // Função para renderizar a lista
+        function renderizarLista(itens) {
+            const listaComprasUl = document.getElementById('listaCompras');
+            listaComprasUl.innerHTML = itens.map((item, index) => `
+                <li>
+                    ${item.nome}  
+                    <button onclick="removerItem(${index})">Remover</button> 
+                </li>
+            `).join('');
+            // Atualiza a lista de compras,coloca os itens "no HTML"
+        }
+
+        // Evento do botão "Adicionar"
+        document.getElementById('adicionarBtn').addEventListener('click', async () => {
+            const novoItemInput = document.getElementById('novoItem');
+            const novoItem = novoItemInput.value.trim(); 
+            if (novoItem) {
+                try {
+                    await adicionarItem(novoItem); 
+                    renderizarLista(await obterItens());
+                    novoItemInput.value = ''; 
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        });
+        // Evento de clique ao botão "Adicionar" : obtem campo de entrada -> tenta adicionar ao servidor -> atualiza a lista na pagina
+        
+        // Carrega a lista inicial (geralmente vazia)
+        window.onload = async () => { 
+            try {
+                renderizarLista(await obterItens()); 
+            } catch (error) {
+                console.error(error); 
+            }
+        };
+        // Quando a página carrega, busca os itens do servidor e renderiza a lista
+    </script>
+</body>
+</html>

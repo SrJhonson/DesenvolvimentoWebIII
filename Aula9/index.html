@@ -12,31 +12,28 @@
 
     <script>
         // Funções para interagir com o backend
-        const obterItens = () => fetch('/itens').then(res => res.json()); 
-        // Busca os itens no servidor usando fetch ("rede") requisição GET e resposta em JSON
-        
+        const obterItens = () => fetch('/itens').then(res => res.json());
+
         const adicionarItem = (nome) => fetch('/itens', { 
             method: 'POST', 
             headers: { 'Content-Type': 'application/json' }, 
             body: JSON.stringify({ nome, comprado: false }) 
         });
-        // Adiciona os itens no servidor usando fetch ("rede") requisição Post e resposta em JSON, status compra false
-        
-        //implantar PUT para atualizar o status do item para comprado
 
-        const removerItem = (index) => fetch(`/itens/${index}`, { method: 'DELETE' }); 
-        // Remove o item         
+        const removerItem = async (id) => {
+            await fetch(`/itens/${id}`, { method: 'DELETE' });
+            renderizarLista(await obterItens());
+        };
 
         // Função para renderizar a lista
         function renderizarLista(itens) {
             const listaComprasUl = document.getElementById('listaCompras');
-            listaComprasUl.innerHTML = itens.map((item, index) => `
+            listaComprasUl.innerHTML = itens.map((item) => `
                 <li>
                     ${item.nome}  
-                    <button onclick="removerItem(${index})">Remover</button> 
+                    <button onclick="removerItem('${item.id}')">Remover</button> 
                 </li>
             `).join('');
-            // Atualiza a lista de compras,coloca os itens "no HTML"
         }
 
         // Evento do botão "Adicionar"
@@ -53,9 +50,8 @@
                 }
             }
         });
-        // Evento de clique ao botão "Adicionar" : obtem campo de entrada -> tenta adicionar ao servidor -> atualiza a lista na pagina
-        
-        // Carrega a lista inicial (geralmente vazia)
+
+        // Carrega a lista inicial
         window.onload = async () => { 
             try {
                 renderizarLista(await obterItens()); 
@@ -63,7 +59,6 @@
                 console.error(error); 
             }
         };
-        // Quando a página carrega, busca os itens do servidor e renderiza a lista
     </script>
 </body>
 </html>

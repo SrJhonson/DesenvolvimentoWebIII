@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "express": "^4.20.0"
+  },
+  "name": "aula12",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "description": ""
+}
